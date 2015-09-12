@@ -3,11 +3,29 @@
 # WebSploit Framework CloudFlare Resolver module
 # Created By 0x0ptim0us (Fardin Allahverdinazhand)
 # Email : 0x0ptim0us@Gmail.Com
+# Modified [9-12-2015] by bakhtak-attack ( Amir Yosufzai )
+# Email : bakhtak.attack@gmail.com
+
 import os
 import socket
 from core import wcolors
 from core import help
 from time import sleep
+from threading import Thread
+
+class resolveit(Thread):
+    def __init__(self,host):
+        Thread.__init__(self)
+        self.host = host
+        self.status = -1
+    def run(self):
+        try:
+            orgip = socket.gethostbyname(host)
+            if orgip:
+                self.status = orgip
+        except(socket.gaierror):
+            self.status = "fail"
+
 
 options = ["google.com"]
 def cloudflare_resolver():
@@ -43,17 +61,19 @@ def cloudflare_resolver():
 'ns3', 'ns4', 'irc', 'server', 'status', 'status', 'portal', 'beta',
 'admin', 'imap', 'smtp')
             try:
-                orgip = socket.gethostbyname(options[0])
+                orgip = resolveit(options[0])
                 print "[-------------------------]"
                 print "[+] Default IP Address : %s"%orgip
                 print "[-------------------------]"
+                orgip.start()
             except(socket.gaierror):
                 print "[-] Error : Host is Down !"
             for i in sub:
                 host = i+'.'+options[0]
                 try:
-                    ip = socket.gethostbyname(host)
+                    ip = resolveit(host)
                     print "[+] %s : %s"%(host, ip)
+                    ip.start()
                 except(socket.gaierror):
                     print "[-] %s : N/A"%host
             cloudflare_resolver()
